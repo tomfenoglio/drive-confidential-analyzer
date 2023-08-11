@@ -1,0 +1,65 @@
+from pydrive.auth import GoogleAuth
+from pydrive.drive import GoogleDrive
+from myapp.models import User, File
+
+def get_or_create_user(gdrive_user):
+    user, created = User.objects.get_or_create(
+        google_drive_user_id=gdrive_user["id"],
+        defaults={
+            "user_email": gdrive_user["emailAddress"],
+            "user_name": gdrive_user["displayName"]
+        }
+    )
+    return user
+
+def get_visibility(permissions):
+    for permission in permissions:
+        if permission["id"] == "anyoneWithLink":
+            return "anyoneWithLink"
+    return "Restricted"
+
+
+def run_inventario():
+    gauth = GoogleAuth()
+    gauth.LocalWebserverAuth()
+    drive = GoogleDrive(gauth)
+
+    # Obtener lista de archivos (propios y compartidos) en Google Drive, excluye las carpetas y archivos en papelera
+    file_list = drive.ListFile({"q": "trashed=false and mimeType != 'application/vnd.google-apps.folder'"}).GetList()
+
+    # Borra todos los registros de la tabla File
+    File.objects.all().delete()
+
+    # Procesar la lista de archivos y guardar en la base de datos
+    for file in file_list:
+        user, created = User.objects.get_or_create(
+            google_drive_user_id=file["owners"][0]["permissionId"],
+            defaults={"user_email": file["owners"][0]["emailAddress"], "user_name": file["owners"][0]["displayName"]}
+        )
+
+        # Obtener la visibilidad
+        file_obj = drive.CreateFile({"id": file["id"]})
+        permissions = file_obj.GetPermissions()
+        visibility = get_visibility(permissions)
+
+       # Obtener la extensión del archivo o asignar la última palabra del MIME Type en caso de que no exista
+        mime_type = file["mimeType"]
+        file_extension = file.get("fileExtension")
+        if not file_extension:
+            mime_type_parts = mime_type.split(".")
+            if len(mime_type_parts) > 1:
+                file_extension = mime_type_parts[-1]
+            else:
+                file_extension = "sin extensión"
+
+        File.objects.create(
+            google_drive_file_id=file["id"],
+            google_drive_user_id=user,
+            file_name=file["title"],
+            file_extension=file_extension,
+            can_edit=file["capabilities"]["canEdit"],
+            visibility=visibility
+        )
+
+if __name__ == "__main__":
+    run_inventario()
