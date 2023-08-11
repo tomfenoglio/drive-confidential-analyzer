@@ -4,8 +4,8 @@ from django.urls import reverse
 
 def get_questions():
     questions = {
+    "Información que permita/ayude a descubrir la identidad de una persona (información personal identificable - PII). Ejemplo: nombres, dni, direcciones, email, teléfono, patente vehiculo, fecha nacimiento, etc.": "Critico",
     "Información financiera confidencial, como estados de cuenta, datos bancarios o informes de inversiones?": "Critico",
-    "Información personal identificable (PII). Ejemplo: nombres, números de seguro social, direcciones, etc.": "Critico",
     "Información médica. Ejemplo: datos médicos, historiales de salud, diagnósticos, registros médicos y cualquier otra información relacionada con la salud de los individuos.": "Critico",
     "Contraseñas y/o credenciales. Ejemplo: claves de acceso, credenciales de inicio de sesión y cualquier otra información que permita el acceso no autorizado a sistemas o cuentas.": "Critico",
     "Propiedad intelectual y secretos comerciales. Ejemplos: Planes de negocio, diseños de productos, estrategias de marketing, patentes, información de investigación y desarrollo, y otros secretos comerciales.": "Critico",

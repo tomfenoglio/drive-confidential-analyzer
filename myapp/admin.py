@@ -11,6 +11,8 @@ class FileAdmin(admin.ModelAdmin):
 
 class PollAdmin(admin.ModelAdmin):
     list_display = ('poll_id', 'google_drive_file_id', 'classification', 'creation_date', 'answer_date')
+    list_filter = ('google_drive_file_id',)  # Agrega el campo para filtrar
+
 
 # Register your models here.
 admin.site.register(User, UserAdmin)
