@@ -1,5 +1,5 @@
 # Drive Confidential Analyzer 🛡️
-### **Descripción**
+## Descripción
 Es una app desarrollada en Django (Python) para analizar archivos de una unidad de Google Drive con el objetivo de evitar la fuga de información confidencial. Permite realizar las siguientes operaciones:
 - Guardar en una base de datos MySQL información sobre todos los archivos contenidos en la unidad de Google Drive.
 - Clasificar dichos archivos en alguna de las categorías (Crítico, Alto, Medio y Bajo) a través del envío automático de un cuestionario al dueño de los mismos. El cuestionario se envia a través de un link que contiene un checklist de preguntas que según sus respuestas,se define una criticidad que se modifica automáticamente en la base de datos.
