@@ -19,6 +19,9 @@ Sigue estos pasos para ejecutar la aplicación:
 7. Ejecuta las migraciones con `python3 manage.py migrate`.
 8. Inicia el servidor con `python3 manage.py runserver`.
 
+Hay que instalar ffmep en el sistema para que pueda funcionar PyDub, no en python.
+
+
 Visita las siguientes URL:
 
 - [Dashboard](http://127.0.0.1:8000/dashboard)
@@ -29,6 +32,8 @@ Visita las siguientes URL:
 - **Django**: Dicho framework aporta significativos beneficios como seguridad integrada, un robusto sistema de autenticación y autorización que permite controlar roles y permisos de usuarios y otras soluciones de seguridad avanzadas.
 - **PyDrive**: El uso de PyDrive proporciona una capa de abstracción sobre la API de Google Drive, simplificando el proceso de autenticación y manejo de archivos y carpetas.
 - **MySQLclient**: Es un conector de Python para la base de datos MySQL. Permite que una aplicación escrita en Python se comunique y trabaje con una base de datos MySQL.
+- **PyDub**: Libreria que nos permite realizar conversión de formato de ficheros de audio.
+- **SpeechRecognition**: Es un 
 
 ## Supuestos
 - Se considera que visibilidad `privada` se refiere al estado `restringido` del acceso general dentro de las opciones de compartir y que visibilidad `pública`, se refiere al estado `Cualquier persona que tenga el vínculo`.

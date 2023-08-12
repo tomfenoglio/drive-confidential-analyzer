@@ -1,4 +1,4 @@
-from myapp.models import File, Poll
+from myapp.models import File, Classification
 from django.core.mail import send_mail
 from django.urls import reverse
 
@@ -52,7 +52,7 @@ def create_polls():
 
     for file in files:
         classification = 'Pendiente'
-        poll = Poll.objects.create(
+        poll = Classification.objects.create(
             google_drive_file_id=file.google_drive_file_id,
             classification=classification
         )
@@ -68,7 +68,7 @@ def create_polls():
         # Envia el email con el link a su dueño
         subject = 'Cuestionario para clasificar archivo'
         message = f'Por favor, complete el cuestionario para clasificar su archivo "{file_name}.{file_extension}". Haga click en el siguiente link:\n\nhttp://127.0.0.1:8000{poll_link}\n\n¡Muchas Gracias!'
-        from_email = 'your@email.com'  # Change to your email address
+        from_email = 'your@email.com'
         recipient_list = [file.google_drive_user.user_email]
 
         send_mail(subject, message, from_email, recipient_list, fail_silently=False)

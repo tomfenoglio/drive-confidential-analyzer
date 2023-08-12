@@ -1,13 +1,13 @@
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
-from .models import File, Poll
+from .models import File, Classification
 
 # Obtiene la lista de archivos que cumplen con los criterios "Critico", "Alto", can_edit=True y visibility "anyWithLink"
 def get_files_to_remove_permission():
     files_to_remove_permission = []
     criticidad_list = ["Critico", "Alto"]
 
-    for poll in Poll.objects.filter(classification__in=criticidad_list):
+    for poll in Classification.objects.filter(classification__in=criticidad_list):
         file = File.objects.filter(
             google_drive_file_id=poll.google_drive_file_id,
             visibility="anyoneWithLink", # ya fue calculado en el inventario

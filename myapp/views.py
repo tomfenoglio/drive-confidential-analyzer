@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.urls import reverse
-from .models import Poll
+from .models import Classification
 from .inventario import run_inventario
 from .clasificar_informacion import create_polls, calculate_classification, get_questions, get_scores
 from .cambiar_visibilidad import main
+from .notificar_audio import notificar_audio
 
 def dashboard(request):
     if request.method == 'POST':
@@ -18,14 +19,14 @@ def dashboard(request):
             run_inventario()
             return render(request, 'dashboard.html', {'message': 'Inventario completado'})
         elif 'notificar_audio' in request.POST:
-            run_inventario()
+            notificar_audio()
             return render(request, 'dashboard.html', {'message': 'Notificación completada'})
     return render(request, 'dashboard.html')
 
 
 
 def poll_view(request, poll_id):
-    poll = get_object_or_404(Poll, poll_id=poll_id)
+    poll = get_object_or_404(Classification, poll_id=poll_id)
     questions = get_questions()
     scores = get_scores()
 
