@@ -52,16 +52,16 @@
 
         <form method="post">
             {% csrf_token %}
-            <button type="submit" name="cambiar_visibilidad" value="true">Restringir archivos publicos de alta criticidad</button>
+            <button type="submit" name="cambiar_visibilidad" value="true">Restringir archivos públicos de alta criticidad</button>
         </form>
 
         <form method="post">
             {% csrf_token %}
-            <button type="submit" name="notificar_audio" value="true">Notificar audios con info PII</button>
+            <button type="submit" name="notificar_audio" value="true">Detectar y notificar audios con información PII</button>
         </form>
 
         {% if message %}
-            <p>{{ message }}</p>
+            <p style="color: green;">{{ message }}</p>
         {% endif %}
     </div>
 </body>

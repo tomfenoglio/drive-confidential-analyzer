@@ -11,16 +11,16 @@ def dashboard(request):
     if request.method == 'POST':
         if 'clasificar_informacion' in request.POST:
             create_polls()
-            return render(request, 'dashboard.html', {'message': 'Clasificación completada'})
+            return render(request, 'dashboard.html', {'message': '"Clasificar información de todos los archivos" COMPLETADO'})
         elif 'cambiar_visibilidad' in request.POST:
             main()
-            return render(request, 'dashboard.html', {'message': 'Restricción completada'})
+            return render(request, 'dashboard.html', {'message': '"Restringir archivos públicos de alta criticidad" COMPLETADO'})
         elif 'inventario' in request.POST:
             run_inventario()
-            return render(request, 'dashboard.html', {'message': 'Inventario completado'})
+            return render(request, 'dashboard.html', {'message': '"Inventariar archivos" COMPLETADO'})
         elif 'notificar_audio' in request.POST:
             notificar_audio()
-            return render(request, 'dashboard.html', {'message': 'Notificación completada'})
+            return render(request, 'dashboard.html', {'message': '"Detectar y notificar audios con información PII" COMPLETADO'})
     return render(request, 'dashboard.html')
 
 

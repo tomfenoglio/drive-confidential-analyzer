@@ -7,7 +7,7 @@ Es una app desarrollada en Django (Python) para analizar archivos de una unidad 
 - Visualizar historial de cambios de criticidad en los archivos.
 - Analizar archivos de audio para detectar contenido con información de identificación personal (PII) y en caso positivo, clasificar dichos archivos como `Crítico` y notificar al dueño vía email con una sugerencia de que debe borrarlos de Google Drive por contener información de alta confidencialidad.
 
-## Instrucciones para su ejecución
+## Instrucciones de instalación
 Sigue estos pasos para ejecutar la aplicación:
 
 1. Clona este repositorio desde GitHub a tu máquina local.
@@ -15,18 +15,19 @@ Sigue estos pasos para ejecutar la aplicación:
 3. Configura la base de datos en `settings.py` con la información de MySQL.
 4. Configura el servidor de email en `settings.py` para el envío automático de cuestionarios y notificaciones por email. En el caso de Gmail, primero hay que ir a la configuración de Gmail, activar la verificación en dos pasos y luego generar una contraseña para aplicaciones.
 5. Configura las credenciales para la API de Google Drive. Sigue las instrucciones en la documentación de PyDrive para obtener las credenciales de OAuth2 y colocar el archivo client_secrets.json en la raíz de tu proyecto.
-Instalar el modelo NLP de Spacy en español corriendo `python -m spacy download es_core_news_md` para que Microsoft Presidio pueda detectar info PII en español. Acá están todos los lenguajes: https://spacy.io/models/es.
-6. Activa el entorno virtual con `pipenv shell`.
-7. Ejecuta las migraciones con `python3 manage.py migrate`.
+6. Instalar el modelo NLP de Spacy en español corriendo `python -m spacy download es_core_news_md` para que Microsoft Presidio pueda detectar info PII en español. Acá están todos los lenguajes: https://spacy.io/models/es.
+instalar ffmep en el sistema para que pueda funcionar PyDub, no en python.
+7. Activa el entorno virtual con `pipenv shell` y ejecuta las migraciones con `python3 manage.py migrate`.
 8. Inicia el servidor con `python3 manage.py runserver`.
 
-Hay que instalar ffmep en el sistema para que pueda funcionar PyDub, no en python.
-Hay que instalar 
+## Instrucciones de uso
+La app tiene las siguientes 4 funciones que se pueden acceder a traves [Dashboard](http://127.0.0.1:8000/dashboard):
+- **Inventariar archivos**: Crea una base de datos en MySQL de todos los archivos encontrados en la unidad de Google Drive.El campo "Classification" trae la última Criticidad definida (si existe).
+- **Clasificar información de todos los archivos**: Envia por email al dueño de cada archivo, un link con acceso a un cuestionario para definir la Criticidad de forma automática a partir de las respuestas. Todos los cambios de clasificación se registran en la tabla "Classification" de la base de datos.
+- **Restringir archivos públicos de alta criticidad**: Cambia la visibilidad a "Privado" en la configuración de Google Drive de todos los archivos que cumplen los siguientes criterios: Clasificación "Critico", "Alto", can_edit=True y visibility "anyWithLink".
+- **Notificar audios con información PII**: Busca los archivos de audio en Google Drive, los convierte a formato WAV para luego poder ser convertidos a texto con SpeechRecognition, busca información PII con Microsoft Presidio y en caso de detección positiva, envía un email al dueño del archivo sugiriendo su eliminación y le asigna "Critico" como clasificación en la base datos (además agrega el comentario "Información PII detectada" para diferenciar dicha clasificación respecto a las de origen de cuestionario).
 
-
-Visita las siguientes URL:
-
-- [Dashboard](http://127.0.0.1:8000/dashboard)
+Para acceder a las visualizaciones de la base de datos:
 - [Admin](http://127.0.0.1:8000/admin) (Superusuario: admin, Contraseña: admin@123!)
 
 
@@ -34,9 +35,10 @@ Visita las siguientes URL:
 - **Django**: Dicho framework aporta significativos beneficios como seguridad integrada, un robusto sistema de autenticación y autorización que permite controlar roles y permisos de usuarios y otras soluciones de seguridad avanzadas.
 - **PyDrive**: El uso de PyDrive proporciona una capa de abstracción sobre la API de Google Drive, simplificando el proceso de autenticación y manejo de archivos y carpetas.
 - **MySQLclient**: Es un conector de Python para la base de datos MySQL. Permite que una aplicación escrita en Python se comunique y trabaje con una base de datos MySQL.
-- **PyDub**: Libreria que nos permite realizar conversión de formato de ficheros de audio.
-- **SpeechRecognition**: Es un 
+- **PyDub**: Libreria que nos permite realizar conversión de formato de ficheros de audio. Se debe tener instalado ffmep.
+- **SpeechRecognition**: Es una biblioteca de Python que sirve para procesar y transcribir el habla humana en texto.
 - **Spacy**: Spacy proporciona modelos NLP (Natural Language Processing) que permiten a Presidio reconocer entidades y realizar otras tareas lingüísticas clave para su funcionamiento. Ademas de la instalacion de Presidio, se debe instalar el modelo NLP en español por separado.
+- **Microsoft Presidio**: Es una plataforma de código abierto desarrollada por Microsoft que se utiliza para el análisis y protección de datos sensibles en entornos empresariales. Su principal objetivo es ayudar a las organizaciones a identificar, clasificar y proteger información confidencial y personal en grandes volúmenes de datos, como texto.
 
 ## Supuestos
 - Se considera que visibilidad `privada` se refiere al estado `restringido` del acceso general dentro de las opciones de compartir y que visibilidad `pública`, se refiere al estado `Cualquier persona que tenga el vínculo`.
@@ -47,7 +49,6 @@ Visita las siguientes URL:
 
 ## Problemas y Soluciones
 - No todos los archivos en Google Drive tienen extensión. Por ejemplo, archivos de Google Docs, Google Drawings, Google Forms, Google Jamboard, Google My Maps, Google Slides, Google Sheets, etc. En esos casos, me pareció apropiado obtener el valor del MIME Type. Por ejemplo: si el archivo no tiene extensión y su MIME Type es `application/vnd.google-apps.document` (es decir un Google Doc) entonces se debe asignar el valor de `document` como extensión.
-- SpeechRecognition no está convirtiendo a texto los audios completos. 
 
 ## Criterios para clasificar la información
 Los criterios a tener en cuenta para el diseño de las preguntas de clasificación de confidencialidad de los archivos son: sensibilidad de la información, propiedad intelectual y secretos comerciales, impacto operativo, cumplimiento normativo, documentación legal, niveles de acceso y si hay algun riesgo de que la divulgación de dicha información impacte negativamente de alguna forma en la empresa y/o individuos internos y externos.
@@ -59,10 +60,3 @@ La clasificación de criticidad puede ser alguna de las siguientes:
 
 Utilicé un sistema de puntos para definir la clasificación con las respuestas del cuestionario. Cada clasificación de criticidad debe ser mayor o igual a un puntaje total: Crítica -> 10.000 puntos, Alta -> 1.000 puntos, Media -> 10 Puntos.
 Todas las preguntas son de respuesta boolean y en caso verdadero, suman la cantidad de puntos de la criticidad que representan. Por ejemplo: una pregunta que si es respondida como `True` es `Critica`, entonces suma 100.000 puntos. Si su criticidad es `Media`, entonces suma `10` puntos. De esta forma es muy sencillo poder hacer modificaciones en las preguntas sin necesidad de modificar la lógica del programa.
-
-## Super bonus track
-1. Filtrar archivos de audio, a través de MIME Type = `application/vnd.google-apps.audio`.
-2. Convertir el audio a un formato apropiado a través de la librería `pydub`. Solo es necesario si el archivo de audio se encuentra en un formato no aceptado por el punto 3.
-3. Convertir el audio a texto a través de la librería `SpeechRecognition`.
-4. Analizar texto para detectar información PII a través de la librería `Microsoft Presidio`. Hay otros servicios como `Azure Text Analytics` (pago) y `Amazon Comprehend` (pago).
-5. Clasificar como `Critico` en caso de que el audio contenga información PII y notificar al dueño vía email que debe eliminar dicho archivo de Google Drive.

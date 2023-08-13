@@ -1,6 +1,7 @@
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 from .models import File, Classification
+from .inventario import authenticate_with_google_drive
 
 # Obtiene la lista de archivos que cumplen con los criterios "Critico", "Alto", can_edit=True y visibility "anyWithLink"
 def get_files_to_remove_permission():
@@ -19,9 +20,7 @@ def get_files_to_remove_permission():
     return files_to_remove_permission
 
 def main():
-    gauth = GoogleAuth()
-    gauth.LocalWebserverAuth()
-    drive = GoogleDrive(gauth)
+    drive = authenticate_with_google_drive()
 
     files_to_remove_permission = get_files_to_remove_permission()
 

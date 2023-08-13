@@ -8,7 +8,7 @@ from presidio_analyzer import AnalyzerEngine
 from presidio_analyzer.nlp_engine import NlpEngineProvider
 from django.utils import timezone
 from django.core.mail import send_mail
-import spacy
+from .inventario import authenticate_with_google_drive
 
 def download_audio_file(drive, google_drive_file_id, local_file_path):
     file = drive.CreateFile({'id': google_drive_file_id})
@@ -53,9 +53,7 @@ def detect_pii_information(text):
     return pii_found
 
 def notificar_audio():
-    gauth = GoogleAuth()
-    gauth.LocalWebserverAuth()
-    drive = GoogleDrive(gauth)
+    drive = authenticate_with_google_drive()
 
     # Obtener lista de archivos formato audio del inventario
     audio_files = File.objects.filter(mime_type__startswith='audio')
@@ -93,7 +91,7 @@ def notificar_audio():
             else:
                 print(f'No se detectó informacion PII en el audio "{audio_file.file_name}"')
 
-            # Envía un correo electrónico al dueño del archivo
+            # Envía email al dueño del archivo
             subject = 'Información PII detectada en archivo de audio'
             message = f"Se ha detectado información PII en el archivo de audio {audio_file.file_name}. Por favor, eliminelo a la brevedad, ya que este tipo de información no debe ser almacenada en Google Drive.\n\n¡Muchas Gracias!"
             from_email = 'your@email.com'

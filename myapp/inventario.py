@@ -3,6 +3,21 @@ from pydrive.drive import GoogleDrive
 from myapp.models import User, File, Classification
 from django.db.models import Q
 
+def authenticate_with_google_drive():
+    gauth = GoogleAuth()
+
+    gauth.LoadCredentialsFile("google_credentials.json") # Carga las credenciales desde el archivo JSON
+    if gauth.credentials is None:
+        gauth.LocalWebserverAuth() # Realiza la autenticación OAuth2 si las credenciales no están disponibles
+    elif gauth.access_token_expired:
+        gauth.Refresh() # Refresca las credenciales si el token de acceso ha expirado
+    else:
+        gauth.Authorize() # Utiliza las credenciales existentes
+
+    gauth.SaveCredentialsFile("google_credentials.json") # Guarda las credenciales actualizadas
+    drive = GoogleDrive(gauth) # Crea el objeto GoogleDrive con las credenciales autenticadas
+    return drive
+
 def get_or_create_user(gdrive_user):
     user, created = User.objects.get_or_create(
         google_drive_user_id=gdrive_user["id"],
@@ -28,9 +43,8 @@ def get_classification(google_drive_file_id):
         return ""
 
 def run_inventario():
-    gauth = GoogleAuth()
-    gauth.LocalWebserverAuth()
-    drive = GoogleDrive(gauth)
+    # Autentica con Google Drive
+    drive = authenticate_with_google_drive()
 
     # Obtiene lista de archivos (propios y compartidos) en Google Drive, excluye las carpetas y archivos en papelera
     file_list = drive.ListFile({"q": "trashed=false and mimeType != 'application/vnd.google-apps.folder'"}).GetList()
