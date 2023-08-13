@@ -24,11 +24,8 @@ def audio_to_text(audio_file_path):
     with sr.AudioFile(audio_file_path) as source:
         #r.adjust_for_ambient_noise(source) # agregado. no cambio nada
         audio_data = r.record(source)
-    try:
         audio_text = r.recognize_google(audio_data, language="es-AR")
         return audio_text
-    except sr.UnknownValueError:
-        return "No se pudo reconocer el texto"
 
 def detect_pii_information(text):
     # Crea la configuracion con el modelo NLP en idioma español agregado (descargar previamente via Spacy)

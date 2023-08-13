@@ -42,7 +42,7 @@ def get_classification(google_drive_file_id):
     except Classification.DoesNotExist:
         return ""
 
-def run_inventario():
+def inventario():
     # Autentica con Google Drive
     drive = authenticate_with_google_drive()
 
@@ -87,4 +87,4 @@ def run_inventario():
         )
 
 if __name__ == "__main__":
-    run_inventario()
+    inventario()

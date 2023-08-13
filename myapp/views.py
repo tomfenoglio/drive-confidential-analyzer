@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.urls import reverse
 from .models import Classification
-from .inventario import run_inventario
+from .inventario import inventario
 from .clasificar_informacion import create_polls, calculate_classification, get_questions, get_scores
 from .cambiar_visibilidad import main
 from .notificar_audio import notificar_audio
@@ -16,7 +16,7 @@ def dashboard(request):
             main()
             return render(request, 'dashboard.html', {'message': '"Restringir archivos públicos de alta criticidad" COMPLETADO'})
         elif 'inventario' in request.POST:
-            run_inventario()
+            inventario()
             return render(request, 'dashboard.html', {'message': '"Inventariar archivos" COMPLETADO'})
         elif 'notificar_audio' in request.POST:
             notificar_audio()
