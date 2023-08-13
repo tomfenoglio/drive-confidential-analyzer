@@ -14,21 +14,20 @@ Sigue estos pasos para ejecutar la aplicación:
 2. Navega a la ubicación del proyecto en la terminal y ejecuta `pipenv install` para instalar las dependencias.
 3. Configura la base de datos en `settings.py` con la información de MySQL.
 4. Configura el servidor de email en `settings.py` para el envío automático de cuestionarios y notificaciones por email. En el caso de Gmail, primero hay que ir a la configuración de Gmail, activar la verificación en dos pasos y luego generar una contraseña para aplicaciones.
-5. Configura las credenciales para la API de Google Drive. Sigue las instrucciones en la documentación de PyDrive para obtener las credenciales de OAuth2 y colocar el archivo client_secrets.json en la raíz de tu proyecto.
-6. Instalar el modelo NLP de Spacy en español corriendo `python -m spacy download es_core_news_md` para que Microsoft Presidio pueda detectar info PII en español. Acá están todos los lenguajes: https://spacy.io/models/es.
-instalar ffmep en el sistema para que pueda funcionar PyDub, no en python.
-7. Activa el entorno virtual con `pipenv shell` y ejecuta las migraciones con `python3 manage.py migrate`.
-8. Inicia el servidor con `python3 manage.py runserver`.
+5. Obtener el OAuth 2.0 Client ID desde https://console.cloud.google.com/. Se descarga un JSON que debe renombrarse a "client_secrets.json" y ubicarse en el root del proyecto, segun las instrucciones en la documentación de PyDrive. Tener en cuenta que deben agregarse manualmente los test users, en las opciones de consentimiento OAuth. 
+6. Instalar el modelo NLP de Spacy en español corriendo `python -m spacy download es_core_news_md` para que Microsoft Presidio pueda detectar info PII en español. Todos los lenguajes: https://spacy.io/models/es.
+7. Chequear tener instalado ffmep en el sistema (no entorno virtual) para el correcto funcionamiento de la libreria PyDub.
+8. Activa el entorno virtual con `pipenv shell` y ejecuta las migraciones con `python3 manage.py migrate`.
+9. Inicia el servidor con `python3 manage.py runserver`.
 
 ## Instrucciones de uso
-La app tiene las siguientes 4 funciones que se pueden acceder a traves [Dashboard](http://127.0.0.1:8000/dashboard):
+La app tiene las siguientes 4 funciones que se pueden acceder a través del [Dashboard](http://127.0.0.1:8000/dashboard):
 - **Inventariar archivos**: Crea una base de datos en MySQL de todos los archivos encontrados en la unidad de Google Drive.El campo "Classification" trae la última Criticidad definida (si existe).
 - **Clasificar información de todos los archivos**: Envia por email al dueño de cada archivo, un link con acceso a un cuestionario para definir la Criticidad de forma automática a partir de las respuestas. Todos los cambios de clasificación se registran en la tabla "Classification" de la base de datos.
 - **Restringir archivos públicos de alta criticidad**: Cambia la visibilidad a "Privado" en la configuración de Google Drive de todos los archivos que cumplen los siguientes criterios: Clasificación "Critico", "Alto", can_edit=True y visibility "anyWithLink".
 - **Notificar audios con información PII**: Busca los archivos de audio en Google Drive, los convierte a formato WAV para luego poder ser convertidos a texto con SpeechRecognition, busca información PII con Microsoft Presidio y en caso de detección positiva, envía un email al dueño del archivo sugiriendo su eliminación y le asigna "Critico" como clasificación en la base datos (además agrega el comentario "Información PII detectada" para diferenciar dicha clasificación respecto a las de origen de cuestionario).
 
-Para acceder a las visualizaciones de la base de datos:
-- [Admin](http://127.0.0.1:8000/admin) (Superusuario: admin, Contraseña: admin@123!)
+Para visualizar el historial de cambios de clasificación (y todas las tablas) ingresar al [Django Administator](http://127.0.0.1:8000/admin) (Superusuario: admin, Contraseña: admin@123!)
 
 
 ## Dependencias utilizadas
@@ -52,6 +51,8 @@ Para acceder a las visualizaciones de la base de datos:
 
 ## Criterios para clasificar la información
 Los criterios a tener en cuenta para el diseño de las preguntas de clasificación de confidencialidad de los archivos son: sensibilidad de la información, propiedad intelectual y secretos comerciales, impacto operativo, cumplimiento normativo, documentación legal, niveles de acceso y si hay algun riesgo de que la divulgación de dicha información impacte negativamente de alguna forma en la empresa y/o individuos internos y externos.
+El cuestionario con todas las preguntas se encuentra en "questions.json" en el root del proyecto.
+
 La clasificación de criticidad puede ser alguna de las siguientes:
 - **Critico**: Información que no debe ser almacenada en este tipo de repositorio. Por ejemplo, información PII, información financiera confidencial, información médica de individuos, contraseñas y/o credenciales, propiedad intelectual y secretos comerciales confidenciales, información confidencial sensible a multas o sanciones regulatorias.
 - **Alto**: Información que puede ser almacenada en este tipo de repositorio pero solo de forma privada. Es decir, solo a personas a las cuales implícitamente se les compartió el archivo de forma particular. Por ejemplo: datos de clientes, proveedores o socios comerciales (que no estén incluidos como PII), documentación legal como contratos, acuerdos legales, documentación de litigios y cualquier otra información relacionada con asuntos legales, datos anónimos de usuarios: Información estadística o datos agregados de usuarios/clientes que no revelan información personal identificable, políticas y procedimientos estándar: documentos de políticas y procedimientos que son relevantes para toda la empresa y no contienen información crítica, materiales de entrenamiento interno: recursos de entrenamiento y desarrollo profesional para empleados que no contienen datos altamente confidenciales o estratégicos.
@@ -60,3 +61,8 @@ La clasificación de criticidad puede ser alguna de las siguientes:
 
 Utilicé un sistema de puntos para definir la clasificación con las respuestas del cuestionario. Cada clasificación de criticidad debe ser mayor o igual a un puntaje total: Crítica -> 10.000 puntos, Alta -> 1.000 puntos, Media -> 10 Puntos.
 Todas las preguntas son de respuesta boolean y en caso verdadero, suman la cantidad de puntos de la criticidad que representan. Por ejemplo: una pregunta que si es respondida como `True` es `Critica`, entonces suma 100.000 puntos. Si su criticidad es `Media`, entonces suma `10` puntos. De esta forma es muy sencillo poder hacer modificaciones en las preguntas sin necesidad de modificar la lógica del programa.
+
+## Mejoras para implementar
+- Se puede aumentar las medidas de seguridad con las credenciales utilizando el algoritmo de encriptación AES, utilizando la librería pycryptodome. De esta manera, cada vez que se necesite hacer uso de la credencial de Google, debe realizarse el proceso de desencriptado y luego encriptado para volver a guardar la credencial nueva. La “secret key” para poder desencriptar, debería estar almacenada en un archivo externo, idealmente en formato python y no estar “hard coded” en el mismo script.
+- Agregar un script para clasificar solo los archivos que no hayan sido clasificados previamente.
+- Mejorar a través de parametrizaciones las configuraciones de Speech Recognition, Spacy y Microsoft Presidio ya que son altamente configurables a modo de mejorar la precisión de conversión, búsqueda y detección.

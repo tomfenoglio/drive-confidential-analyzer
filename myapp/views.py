@@ -6,6 +6,7 @@ from .inventario import inventario
 from .clasificar_informacion import create_polls, calculate_classification, get_questions, get_scores
 from .cambiar_visibilidad import main
 from .notificar_audio import notificar_audio
+import json
 
 def dashboard(request):
     if request.method == 'POST':
