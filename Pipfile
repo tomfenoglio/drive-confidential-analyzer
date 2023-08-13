@@ -11,6 +11,7 @@ speechrecognition = "*"
 pydub = "*"
 ffmpeg = "*"
 presidio-analyzer = "*"
+spacy = "*"
 
 [dev-packages]
 

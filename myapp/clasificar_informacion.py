@@ -63,11 +63,10 @@ def create_polls():
 
         # Obtiene el nombre y la extension del archivo
         file_name = file.file_name
-        file_extension = file.file_extension
 
         # Envia el email con el link a su dueño
         subject = 'Cuestionario para clasificar archivo'
-        message = f'Por favor, complete el cuestionario para clasificar su archivo "{file_name}.{file_extension}". Haga click en el siguiente link:\n\nhttp://127.0.0.1:8000{poll_link}\n\n¡Muchas Gracias!'
+        message = f'Por favor, complete el cuestionario para clasificar su archivo "{file_name}". Haga click en el siguiente link:\n\nhttp://127.0.0.1:8000{poll_link}\n\n¡Muchas Gracias!'
         from_email = 'your@email.com'
         recipient_list = [file.google_drive_user.user_email]
 

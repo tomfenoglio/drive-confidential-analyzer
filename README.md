@@ -15,11 +15,13 @@ Sigue estos pasos para ejecutar la aplicación:
 3. Configura la base de datos en `settings.py` con la información de MySQL.
 4. Configura el servidor de email en `settings.py` para el envío automático de cuestionarios y notificaciones por email. En el caso de Gmail, primero hay que ir a la configuración de Gmail, activar la verificación en dos pasos y luego generar una contraseña para aplicaciones.
 5. Configura las credenciales para la API de Google Drive. Sigue las instrucciones en la documentación de PyDrive para obtener las credenciales de OAuth2 y colocar el archivo client_secrets.json en la raíz de tu proyecto.
+Instalar el modelo NLP de Spacy en español corriendo `python -m spacy download es_core_news_md` para que Microsoft Presidio pueda detectar info PII en español. Acá están todos los lenguajes: https://spacy.io/models/es.
 6. Activa el entorno virtual con `pipenv shell`.
 7. Ejecuta las migraciones con `python3 manage.py migrate`.
 8. Inicia el servidor con `python3 manage.py runserver`.
 
 Hay que instalar ffmep en el sistema para que pueda funcionar PyDub, no en python.
+Hay que instalar 
 
 
 Visita las siguientes URL:
@@ -34,6 +36,7 @@ Visita las siguientes URL:
 - **MySQLclient**: Es un conector de Python para la base de datos MySQL. Permite que una aplicación escrita en Python se comunique y trabaje con una base de datos MySQL.
 - **PyDub**: Libreria que nos permite realizar conversión de formato de ficheros de audio.
 - **SpeechRecognition**: Es un 
+- **Spacy**: Spacy proporciona modelos NLP (Natural Language Processing) que permiten a Presidio reconocer entidades y realizar otras tareas lingüísticas clave para su funcionamiento. Ademas de la instalacion de Presidio, se debe instalar el modelo NLP en español por separado.
 
 ## Supuestos
 - Se considera que visibilidad `privada` se refiere al estado `restringido` del acceso general dentro de las opciones de compartir y que visibilidad `pública`, se refiere al estado `Cualquier persona que tenga el vínculo`.
@@ -44,6 +47,7 @@ Visita las siguientes URL:
 
 ## Problemas y Soluciones
 - No todos los archivos en Google Drive tienen extensión. Por ejemplo, archivos de Google Docs, Google Drawings, Google Forms, Google Jamboard, Google My Maps, Google Slides, Google Sheets, etc. En esos casos, me pareció apropiado obtener el valor del MIME Type. Por ejemplo: si el archivo no tiene extensión y su MIME Type es `application/vnd.google-apps.document` (es decir un Google Doc) entonces se debe asignar el valor de `document` como extensión.
+- SpeechRecognition no está convirtiendo a texto los audios completos. 
 
 ## Criterios para clasificar la información
 Los criterios a tener en cuenta para el diseño de las preguntas de clasificación de confidencialidad de los archivos son: sensibilidad de la información, propiedad intelectual y secretos comerciales, impacto operativo, cumplimiento normativo, documentación legal, niveles de acceso y si hay algun riesgo de que la divulgación de dicha información impacte negativamente de alguna forma en la empresa y/o individuos internos y externos.

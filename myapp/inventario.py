@@ -19,7 +19,7 @@ def get_visibility(permissions):
             return "anyoneWithLink"
     return "Restricted"
 
-# Trae el valor de la ultima clasificación efectuada
+# Trae el valor de la ultima clasificación ejecutada
 def get_classification(google_drive_file_id):
     try:
         classification = Classification.objects.filter(Q(google_drive_file_id=google_drive_file_id) & ~Q(classification="Anulado")).latest("answer_date")
@@ -38,7 +38,7 @@ def run_inventario():
     # Borra todos los registros de la tabla File
     File.objects.all().delete()
 
-    # Procesa la lista de archivos y guardar en la base de datos
+    # Procesa la lista de archivos y la guarda en la base de datos
     for file in file_list:
         user, created = User.objects.get_or_create(
             google_drive_user_id=file["owners"][0]["permissionId"],
@@ -50,7 +50,7 @@ def run_inventario():
         permissions = file_obj.GetPermissions()
         visibility = get_visibility(permissions)
 
-       # Obtiene la extensión del archivo o asignar la última palabra del MIME Type en caso de que no exista
+       # Obtiene la extensión del archivo, si no existe, asigna el MIME Type de Google
         mime_type = file["mimeType"]
         file_extension = file.get("fileExtension")
         if not file_extension:
