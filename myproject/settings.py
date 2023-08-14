@@ -78,7 +78,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'drive_confidential_analyzer',
-        "HOST": "db", # "127.0.0.1" si pongo "db" la app anda pero no la base de datos
+        "HOST": "db", # "127.0.0.1" para ejecutar sin docker. En caso de usar docker, poner "db"
         "PORT": "3306",
         "USER": "root",
         "PASSWORD": "admin@123!",
