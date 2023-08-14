@@ -37,6 +37,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-# Si el permiso se llega a cambiar, antes de correr este script no pasa nada. Pero si el can_edit pasa a "False" entre que se hace el inventario y se ejecuta este script, va a dar error. El tema es que no quiero volver a traer la info de can_edit.
-# En el peor de los casos tira un error en el django admin, pero la app sigue corriendo

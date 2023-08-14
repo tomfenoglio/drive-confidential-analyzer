@@ -21,14 +21,20 @@ Sigue estos pasos para ejecutar la aplicación:
 9. Inicia el servidor con `python3 manage.py runserver`.
 
 ## Instrucciones de uso
-La app tiene las siguientes 4 funciones que se pueden acceder a través del [Dashboard](http://127.0.0.1:8000/dashboard):
-- **Inventariar archivos**: Crea una base de datos en MySQL de todos los archivos encontrados en la unidad de Google Drive.El campo "Classification" trae la última Criticidad definida (si existe).
+- La app tiene las siguientes 4 funciones que se pueden acceder a través del [Dashboard](http://127.0.0.1:8000/dashboard).
+
+    ![Alt text](dashboard.png)
+
+- **Inventariar archivos**: Almacena en una tabla de MySQL de todos los archivos encontrados en la unidad de Google Drive (primero se borran los registros existentes). El campo "Classification" trae la última Criticidad definida (si existe).
 - **Clasificar información de todos los archivos**: Envia por email al dueño de cada archivo, un link con acceso a un cuestionario para definir la Criticidad de forma automática a partir de las respuestas. Todos los cambios de clasificación se registran en la tabla "Classification" de la base de datos.
+
+    ![Alt text](email.png)
+    ![Alt text](poll.png)
+
 - **Restringir archivos públicos de alta criticidad**: Cambia la visibilidad a "Privado" en la configuración de Google Drive de todos los archivos que cumplen los siguientes criterios: Clasificación "Critico", "Alto", can_edit=True y visibility "anyWithLink".
 - **Notificar audios con información PII**: Busca los archivos de audio en Google Drive, los convierte a formato WAV para luego poder ser convertidos a texto con SpeechRecognition, busca información PII con Microsoft Presidio y en caso de detección positiva, envía un email al dueño del archivo sugiriendo su eliminación y le asigna "Critico" como clasificación en la base datos (además agrega el comentario "Información PII detectada" para diferenciar dicha clasificación respecto a las de origen de cuestionario).
 
 Para visualizar el historial de cambios de clasificación (y todas las tablas) ingresar al [Django Administator](http://127.0.0.1:8000/admin) (Superusuario: admin, Contraseña: admin@123!)
-
 
 ## Dependencias utilizadas
 - **Django**: Dicho framework aporta significativos beneficios como seguridad integrada, un robusto sistema de autenticación y autorización que permite controlar roles y permisos de usuarios y otras soluciones de seguridad avanzadas.

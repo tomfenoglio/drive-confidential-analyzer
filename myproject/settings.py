@@ -82,9 +82,13 @@ DATABASES = {
         "PORT": "3306",
         "USER": "root",
         "PASSWORD": "admin@123!",
+        'OPTIONS': {
+            'charset': 'utf8mb4', # agregado a causa del error por file_name con emoticones
+        }
+    }
 
     }
-}
+
 
 
 # Password validation

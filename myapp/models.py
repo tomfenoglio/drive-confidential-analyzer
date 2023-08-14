@@ -13,7 +13,7 @@ class User(models.Model):
 class File(models.Model):
     google_drive_file_id = models.CharField(primary_key=True, max_length=255)
     google_drive_user = models.ForeignKey('User', on_delete=models.CASCADE)
-    file_name = models.CharField(max_length=255)
+    file_name = models.TextField()
     file_extension = models.CharField(max_length=20)
     mime_type = models.CharField(max_length=200)
     visibility = models.CharField(max_length=20)
