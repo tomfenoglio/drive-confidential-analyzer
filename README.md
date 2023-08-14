@@ -7,14 +7,23 @@ Es una app desarrollada en Django (Python) para analizar archivos de una unidad 
 - Visualizar historial de cambios de criticidad en los archivos.
 - Analizar archivos de audio para detectar contenido con información de identificación personal (PII) y en caso positivo, clasificar dichos archivos como `Crítico` y notificar al dueño vía email con una sugerencia de que debe borrarlos de Google Drive por contener información de alta confidencialidad.
 
-## Instrucciones de instalación
-Sigue estos pasos para ejecutar la aplicación:
+## Instrucciones de ejecución con Docker
 
-1. Clona este repositorio desde GitHub a tu máquina local.
+1. Clonar el repositorio en local y obtener el OAuth 2.0 Client ID desde [Google Cloud Console](https://console.cloud.google.com/). Se descarga un JSON que debe renombrarse a "client_secrets.json" y ubicarse en el root del proyecto, segun las instrucciones en la documentación de PyDrive. Tener en cuenta que deben agregarse manualmente los test users, en las opciones de consentimiento OAuth.
+2. Construir la imagen de Docker desde root directory `docker build -t drive-confidential-analyzer .`.
+3. Ejecutar la imágen construida `docker-compose up`. Si no se ejecuta correctamente, detener el proceso con `Ctrl+C` y volver a ejecutar.
+4. Crear superuser para poder acceder al Django Admin `docker-compose exec web python manage.py createsuperuser`.
+5. Acceder a la app: http://localhost:8000/dashboard o acceder a Django Admin: http://localhost:8000/admin.
+6. Para detener la Aplicación presionar `Ctrl+C` en la terminal donde se ejecutó Docker y luego `docker-compose down`
+
+
+## Instrucciones de ejecución sin Docker
+
+1. Clonar el repositorio en local.
 2. Navega a la ubicación del proyecto en la terminal y ejecuta `pipenv install` para instalar las dependencias.
 3. Configura la base de datos en `settings.py` con la información de MySQL.
 4. Configura el servidor de email en `settings.py` para el envío automático de cuestionarios y notificaciones por email. En el caso de Gmail, primero hay que ir a la configuración de Gmail, activar la verificación en dos pasos y luego generar una contraseña para aplicaciones.
-5. Obtener el OAuth 2.0 Client ID desde https://console.cloud.google.com/. Se descarga un JSON que debe renombrarse a "client_secrets.json" y ubicarse en el root del proyecto, segun las instrucciones en la documentación de PyDrive. Tener en cuenta que deben agregarse manualmente los test users, en las opciones de consentimiento OAuth. 
+5. Obtener el OAuth 2.0 Client ID desde https://console.cloud.google.com/. Se descarga un JSON que debe renombrarse a "client_secrets.json" y ubicarse en el root del proyecto, segun las instrucciones en la documentación de PyDrive. Tener en cuenta que deben agregarse manualmente los test users, en las opciones de consentimiento OAuth.
 6. Instalar el modelo NLP de Spacy en español corriendo `python -m spacy download es_core_news_md` para que Microsoft Presidio pueda detectar info PII en español. Todos los lenguajes: https://spacy.io/models/es.
 7. Chequear tener instalado ffmep en el sistema (no entorno virtual) para el correcto funcionamiento de la libreria PyDub.
 8. Activa el entorno virtual con `pipenv shell` y ejecuta las migraciones con `python3 manage.py migrate`.
@@ -23,13 +32,13 @@ Sigue estos pasos para ejecutar la aplicación:
 ## Instrucciones de uso
 - La app tiene las siguientes 4 funciones que se pueden acceder a través del [Dashboard](http://127.0.0.1:8000/dashboard).
 
-    ![Alt text](dashboard.png)
+    ![Alt text](images/dashboard.png)
 
 - **Inventariar archivos**: Almacena en una tabla de MySQL de todos los archivos encontrados en la unidad de Google Drive (primero se borran los registros existentes). El campo "Classification" trae la última Criticidad definida (si existe).
 - **Clasificar información de todos los archivos**: Envia por email al dueño de cada archivo, un link con acceso a un cuestionario para definir la Criticidad de forma automática a partir de las respuestas. Todos los cambios de clasificación se registran en la tabla "Classification" de la base de datos.
 
-    ![Alt text](email.png)
-    ![Alt text](poll.png)
+    ![Alt text](images/email.png)
+    ![Alt text](images/poll.png)
 
 - **Restringir archivos públicos de alta criticidad**: Cambia la visibilidad a "Privado" en la configuración de Google Drive de todos los archivos que cumplen los siguientes criterios: Clasificación "Critico", "Alto", can_edit=True y visibility "anyWithLink".
 - **Notificar audios con información PII**: Busca los archivos de audio en Google Drive, los convierte a formato WAV para luego poder ser convertidos a texto con SpeechRecognition, busca información PII con Microsoft Presidio y en caso de detección positiva, envía un email al dueño del archivo sugiriendo su eliminación y le asigna "Critico" como clasificación en la base datos (además agrega el comentario "Información PII detectada" para diferenciar dicha clasificación respecto a las de origen de cuestionario).

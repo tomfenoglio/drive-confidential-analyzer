@@ -1,0 +1,30 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    # aAgregué las migraciones directamente acá para no tener que hacerlo al ejecutar el programa
+    command: >
+      sh -c "python manage.py makemigrations &&
+              python manage.py migrate &&
+              python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - /tmp/app/mysqld:/run/mysqld
+    depends_on:
+      - db
+    environment:
+      DJANGO_SETTINGS_MODULE: "myproject.settings"  # Ajusta el nombre del módulo de configuración de Django
+
+  db:
+    image: mysql:8
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: drive_confidential_analyzer
+      #MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: admin@123!
+      MYSQL_PASSWORD: admin@123!
+      #MYSQL_HOST: 127.0.0.1
