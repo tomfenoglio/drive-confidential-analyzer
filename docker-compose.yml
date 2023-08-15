@@ -10,6 +10,7 @@ services:
               python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
+      - "8080:8080"
     volumes:
       - .:/app
       - /tmp/app/mysqld:/run/mysqld

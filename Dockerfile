@@ -1,31 +1,32 @@
 # Usa una imagen de Python como base
 FROM python:3.8
 
+# Ahora hay que definir paso por paso como seria toda la instalación del proyecto
 # Establece variables de entorno para no escribir en la terminal interactiva durante la instalación
 ENV PYTHONUNBUFFERED 1
 ENV LANG C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Directorio de trabajo dentro del contenedor
+# Crea una carpeta y se ubica de ella para la ejecución de los proximos comandos
 WORKDIR /app
 
 # Copia el archivo requirements.txt al contenedor
 COPY requirements.txt /app/
 
-# Esto lo agregué porque FFmpeg es necesario para usar PyDub y desde requirements daba error
+# Instala FFmpeg en el environment (necesario para usar la libreria PyDub)
 RUN apt-get update && \
     apt-get install -y ffmpeg
 
-# Instala las dependencias del proyecto
+# Instala las dependencias del proyecto (numpy tuve que sacar la version en requirements.txt porque daba error)
 RUN pip install -r requirements.txt
 
-# Copia el contenido de tu proyecto al directorio de trabajo del contenedor
+# Copia todo el contenido de la carpeta donde esta este archivo a la imagen del contenedor que estamos creando
+# Si queremos ignorar ciertos archivos en la imagen del contenedor, hay que crear un ".dockerignore" (como git)
 COPY . /app/
 
-# Expone el puerto en el que se ejecutará el servidor de Django
+# Indicar qué puertos se desean utilizar para la comunicación con el exterior del contenedor. Tener en cuenta que esto solo documenta la intención de exponer esos puertos, y aún necesitarás configurar el mapeo de puertos al ejecutar el contenedor (a traves de docker-compose.yml).
 EXPOSE 8000
+EXPOSE 8080
 
-# Comando para ejecutar el servidor de desarrollo de Django
+# Cuando se inicie el contenedor que se cree a partir de la imagen de este Dockerfile, se va a ejecutar:
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-
-

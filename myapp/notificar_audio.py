@@ -31,8 +31,7 @@ def detect_pii_information(text):
     # Crea la configuracion con el modelo NLP en idioma español agregado (descargar previamente via Spacy)
     configuration = {
         "nlp_engine_name": "spacy",
-        "models": [{"lang_code": "es", "model_name": "es_core_news_md"},
-                    {"lang_code": "en", "model_name": "en_core_web_lg"}],
+        "models": [{"lang_code": "es", "model_name": "es_core_news_md"}],
     }
 
     # Crea el NLP engine basado en la configuración
@@ -42,7 +41,7 @@ def detect_pii_information(text):
     # Actualiza el AnalyzerEngine con el nuevo NLP engine e idioma español
     analyzer = AnalyzerEngine(
         nlp_engine=nlp_engine_with_spanish,
-        supported_languages=["en", "es"]
+        supported_languages=["es"]
     )
 
     results = analyzer.analyze(text=text, language="es")
