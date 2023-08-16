@@ -77,8 +77,8 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'drive_confidential_analyzer',
-        "HOST": "db", # "127.0.0.1" para ejecutar sin docker. En caso de usar docker, poner "db"
+        'NAME': 'drive_analyzer',
+        "HOST": "db", # "127.0.0.1" para ejecutar sin dockerizar la app, caso contrario (docker-compose), poner "db"
         "PORT": "3306",
         "USER": "root",
         "PASSWORD": "admin@123!",
@@ -88,7 +88,7 @@ DATABASES = {
     }
 
     }
-
+# docker run --name mysql_db -e MYSQL_ROOT_PASSWORD=admin@123! -e MYSQL_DATABASE=drive_analyzer -p 3306:3306 -d mysql:latest
 
 
 # Password validation
@@ -139,3 +139,4 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'tomfenoglio@gmail.com'
 EMAIL_HOST_PASSWORD = 'dwtsrfmnvccfonzi'
+# En el caso de Gmail, primero hay que ir a la configuración de Gmail, activar la verificación en dos pasos y luego generar una contraseña para aplicaciones.

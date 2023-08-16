@@ -1,31 +1,38 @@
-version: '3'
+version: '3' # versión de la sintaxis de Docker Compose
 
-services:
-  web:
-    build: .
-    # aAgregué las migraciones directamente acá para no tener que hacerlo al ejecutar el programa
+services: # aca se definen los servicios que serán ejecutados en contenedores separados
+  web: # esta es la app
+    build: .   # especifica que el Dockerfile está en el directorio actual (.) para poder constuir la imagen del contenedor
+
+    # comando que se ejecutará cuando el contenedor se inicie
     command: >
       sh -c "python manage.py makemigrations &&
               python manage.py migrate &&
               python manage.py runserver 0.0.0.0:8000"
-    ports:
+
+    ports: # mapeo de puertos entre "host:contenedor"
       - "8000:8000"
       - "8080:8080"
     volumes:
       - .:/app
       - /tmp/app/mysqld:/run/mysqld
-    depends_on:
-      - db
+    depends_on: # especifica que primero debe ejecutarse db, pero no espera a que db se encuentre listo
+      db:
+        condition: service_healthy # esto es para que se cumpla la condicion "healthcheck" de la db
     environment:
       DJANGO_SETTINGS_MODULE: "myproject.settings"  # Ajusta el nombre del módulo de configuración de Django
 
-  db:
-    image: mysql:8
-    ports:
+  db: # esta es la database
+    image: mysql:8  # MySQL versión 8 desde Docker Hub
+    ports: # mapeo de puertos entre "host:contenedor"
       - "3306:3306"
     environment:
-      MYSQL_DATABASE: drive_confidential_analyzer
-      #MYSQL_USER: root
+      MYSQL_DATABASE: drive_analyzer
       MYSQL_ROOT_PASSWORD: admin@123!
-      MYSQL_PASSWORD: admin@123!
       #MYSQL_HOST: 127.0.0.1
+      #MYSQL_USER: root
+      #MYSQL_PASSWORD: admin@123!
+    healthcheck: # lo agregué para que se cumpla esta condicion, antes de iniciar la app
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
